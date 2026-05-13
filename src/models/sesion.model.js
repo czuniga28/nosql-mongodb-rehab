@@ -2,114 +2,114 @@
 
 const mongoose = require('mongoose');
 
-// ── Sub-schema: datos biomecánicos por ejercicio ─────────────────────────────
-const ejercicioSchema = new mongoose.Schema(
+// ── Sub-schema: biomechanical data per exercise ───────────────────────────────
+const exerciseSchema = new mongoose.Schema(
   {
-    nombre: {
+    firstName: {
       type: String,
-      required: [true, 'El nombre del ejercicio es obligatorio'],
+      required: [true, 'Exercise name is required'],
       trim: true,
     },
-    series: { type: Number, min: 1 },
-    repeticiones: { type: Number, min: 0 },
-    duracionSegundos: { type: Number, min: 0 },
-    // Datos biomecánicos capturados (p.ej. ángulos de articulaciones)
-    biomecanica: {
-      anguloRodilla: { type: Number },       // grados
-      anguloHombro: { type: Number },        // grados
-      anguloTobillo: { type: Number },       // grados
-      simetria: { type: Number, min: 0, max: 100 }, // % simetría corporal
+    sets:            { type: Number, min: 1 },
+    reps:            { type: Number, min: 0 },
+    durationSeconds: { type: Number, min: 0 },
+    // Biomechanical data captured (e.g. joint angles)
+    biomechanics: {
+      kneeAngle:     { type: Number }, // degrees
+      shoulderAngle: { type: Number }, // degrees
+      ankleAngle:    { type: Number }, // degrees
+      symmetry:      { type: Number, min: 0, max: 100 }, // % body symmetry
     },
-    // Puntuación del ejercicio individual (0–100)
-    puntuacion: { type: Number, min: 0, max: 100 },
-    notas: { type: String, trim: true },
+    // Individual exercise score (0–100)
+    score: { type: Number, min: 0, max: 100 },
+    notes: { type: String, trim: true },
   },
-  { _id: false } // No genera _id para cada subdocumento
+  { _id: false }
 );
 
-// ── Schema principal: Sesion ─────────────────────────────────────────────────
-const sesionSchema = new mongoose.Schema(
+// ── Main schema: Session ──────────────────────────────────────────────────────
+const sessionSchema = new mongoose.Schema(
   {
-    pacienteId: {
+    patientId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Paciente',
-      required: [true, 'El paciente es obligatorio'],
+      ref: 'Patient',
+      required: [true, 'Patient is required'],
       index: true,
     },
-    fecha: {
+    date: {
       type: Date,
-      required: [true, 'La fecha de la sesión es obligatoria'],
+      required: [true, 'Session date is required'],
       default: Date.now,
     },
-    tipoSesion: {
+    sessionType: {
       type: String,
-      enum: ['evaluacion', 'terapia', 'fortalecimiento', 'estiramientos', 'cardio', 'otro'],
-      required: [true, 'El tipo de sesión es obligatorio'],
+      enum: ['evaluation', 'therapy', 'strengthening', 'stretching', 'cardio', 'other'],
+      required: [true, 'Session type is required'],
     },
-    terapeuta: {
+    therapist: {
       type: String,
       trim: true,
     },
-    estado: {
+    status: {
       type: String,
-      enum: ['programada', 'en_curso', 'completada', 'cancelada'],
-      default: 'programada',
+      enum: ['scheduled', 'in_progress', 'completed', 'cancelled'],
+      default: 'scheduled',
     },
-    duracionMinutos: {
+    durationMinutes: {
       type: Number,
-      min: [1, 'La duración mínima es 1 minuto'],
+      min: [1, 'Minimum duration is 1 minute'],
     },
-    // Lista de ejercicios realizados en la sesión
-    ejercicios: [ejercicioSchema],
-    // Puntuación global de la sesión (0–100), puede calcularse como promedio
-    puntuacionGeneral: {
+    // List of exercises performed in the session
+    exercises: [exerciseSchema],
+    // Overall session score (0–100), can be computed as an average
+    overallScore: {
       type: Number,
       min: 0,
       max: 100,
     },
-    // Nivel de dolor reportado por el paciente (escala 0–10)
-    nivelDolor: {
+    // Pain level reported by the patient (scale 0–10)
+    painLevel: {
       type: Number,
       min: 0,
       max: 10,
     },
-    // Observaciones clínicas del terapeuta
-    observaciones: {
+    // Clinical notes from the therapist
+    clinicalNotes: {
       type: String,
       trim: true,
     },
-    // Indicadores de progreso respecto a la sesión anterior
-    progreso: {
-      mejoraAngular: { type: Number },     // delta de ángulo en grados
-      mejoraFuerza: { type: Number },      // delta en kg/N
-      mejoraSimetria: { type: Number },    // delta en %
+    // Progress indicators compared to the previous session
+    progress: {
+      angularImprovement:  { type: Number }, // angle delta in degrees
+      strengthImprovement: { type: Number }, // delta in kg/N
+      symmetryImprovement: { type: Number }, // delta in %
     },
   },
   {
-    timestamps: true,  // createdAt, updatedAt
+    timestamps: true,
     versionKey: false,
   }
 );
 
-// ── Índices ───────────────────────────────────────────────────────────────────
-sesionSchema.index({ pacienteId: 1, fecha: -1 });  // historial por paciente (más reciente primero)
-sesionSchema.index({ tipoSesion: 1 });
-sesionSchema.index({ estado: 1 });
-sesionSchema.index({ fecha: -1 });
+// ── Indexes ───────────────────────────────────────────────────────────────────
+sessionSchema.index({ patientId: 1, date: -1 }); // patient history (most recent first)
+sessionSchema.index({ sessionType: 1 });
+sessionSchema.index({ status: 1 });
+sessionSchema.index({ date: -1 });
 
-// ── Hook pre-save: calcular puntuacionGeneral si no viene en el body ──────────
-sesionSchema.pre('save', function (next) {
-  if (!this.puntuacionGeneral && this.ejercicios && this.ejercicios.length > 0) {
-    const validos = this.ejercicios.filter((e) => e.puntuacion != null);
-    if (validos.length > 0) {
-      this.puntuacionGeneral = Math.round(
-        validos.reduce((sum, e) => sum + e.puntuacion, 0) / validos.length
+// ── Pre-save hook: compute overallScore if not provided ───────────────────────
+sessionSchema.pre('save', function (next) {
+  if (!this.overallScore && this.exercises && this.exercises.length > 0) {
+    const scored = this.exercises.filter((e) => e.score != null);
+    if (scored.length > 0) {
+      this.overallScore = Math.round(
+        scored.reduce((sum, e) => sum + e.score, 0) / scored.length
       );
     }
   }
   next();
 });
 
-const Sesion = mongoose.model('Sesion', sesionSchema);
+const Session = mongoose.model('Session', sessionSchema);
 
-module.exports = Sesion;
+module.exports = Session;
