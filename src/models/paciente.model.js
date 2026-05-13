@@ -2,79 +2,79 @@
 
 const mongoose = require('mongoose');
 
-const pacienteSchema = new mongoose.Schema(
+const patientSchema = new mongoose.Schema(
   {
-    nombre: {
+    firstName: {
       type: String,
-      required: [true, 'El nombre es obligatorio'],
+      required: [true, 'First name is required'],
       trim: true,
     },
-    apellidos: {
+    lastName: {
       type: String,
-      required: [true, 'Los apellidos son obligatorios'],
+      required: [true, 'Last name is required'],
       trim: true,
     },
-    fechaNacimiento: {
+    birthDate: {
       type: Date,
-      required: [true, 'La fecha de nacimiento es obligatoria'],
+      required: [true, 'Birth date is required'],
     },
-    genero: {
+    gender: {
       type: String,
-      enum: ['masculino', 'femenino', 'otro'],
-      required: [true, 'El género es obligatorio'],
+      enum: ['male', 'female', 'other'],
+      required: [true, 'Gender is required'],
     },
-    contacto: {
-      telefono: { type: String, trim: true },
+    contact: {
+      phone: { type: String, trim: true },
       email: {
         type: String,
         trim: true,
         lowercase: true,
-        match: [/^\S+@\S+\.\S+$/, 'Formato de correo inválido'],
+        match: [/^\S+@\S+\.\S+$/, 'Invalid email format'],
       },
     },
-    diagnostico: {
-      tipo: {
+    diagnosis: {
+      type: {
         type: String,
-        required: [true, 'El tipo de diagnóstico es obligatorio'],
+        required: [true, 'Diagnosis type is required'],
         trim: true,
       },
-      descripcion: { type: String, trim: true },
-      fechaDiagnostico: { type: Date },
+      description:   { type: String, trim: true },
+      diagnosisDate: { type: Date },
     },
-    estadoRecuperacion: {
+    recoveryStatus: {
       type: String,
-      enum: ['inicial', 'en_progreso', 'avanzado', 'alta'],
-      default: 'inicial',
+      enum: ['initial', 'in_progress', 'advanced', 'discharged'],
+      default: 'initial',
     },
-    // Score de 0–100 que se actualiza tras cada sesión
-    nivelRecuperacion: {
+    // Score 0–100 updated after each session
+    recoveryLevel: {
       type: Number,
       min: 0,
       max: 100,
       default: 0,
     },
-    activo: {
+    active: {
       type: Boolean,
       default: true,
     },
   },
   {
-    timestamps: true,  // agrega createdAt y updatedAt automáticamente
+    timestamps: true,
     versionKey: false,
   }
 );
 
-// ── Índices ──────────────────────────────────────────────────────────────────
-pacienteSchema.index({ apellidos: 1, nombre: 1 });          // ordenación/búsqueda por nombre
-pacienteSchema.index({ 'diagnostico.tipo': 1 });            // filtro por diagnóstico
-pacienteSchema.index({ estadoRecuperacion: 1 });            // filtro por estado
-pacienteSchema.index({ activo: 1 });                        // soft-delete filter
+// ── Indexes ───────────────────────────────────────────────────────────────────
+patientSchema.index({ lastName: 1, firstName: 1 }); // sort/search by name
+patientSchema.index({ 'diagnosis.type': 1 });        // filter by diagnosis
+patientSchema.index({ recoveryStatus: 1 });          // filter by status
+patientSchema.index({ active: 1 });                  // soft-delete filter
 
-// ── Virtual: nombre completo ──────────────────────────────────────────────────
-pacienteSchema.virtual('nombreCompleto').get(function () {
-  return `${this.nombre} ${this.apellidos}`;
+// ── Virtual: full name ────────────────────────────────────────────────────────
+patientSchema.virtual('fullName').get(function () {
+  return `${this.firstName} ${this.lastName}`;
 });
 
-const Paciente = mongoose.model('Paciente', pacienteSchema);
+const Patient = mongoose.model('Patient', patientSchema);
 
-module.exports = Paciente;
+module.exports = Patient;
