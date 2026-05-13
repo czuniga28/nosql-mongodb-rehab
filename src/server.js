@@ -1,0 +1,18 @@
+'use strict';
+
+require('dotenv').config();
+
+const app = require('./app');
+const { connectDB } = require('./config/database');
+
+const PORT = process.env.PORT || 3000;
+
+const start = async () => {
+  await connectDB();
+  app.listen(PORT, () => {
+    console.log(`BioRehab API running on http://localhost:${PORT}`);
+    console.log(`Health check: http://localhost:${PORT}/health`);
+  });
+};
+
+start();
