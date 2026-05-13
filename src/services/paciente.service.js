@@ -1,7 +1,7 @@
 'use strict';
 
 const mongoose = require('mongoose');
-const Paciente = require('../models/paciente.model');
+const Patient  = require('../models/paciente.model');
 
 const makeError = (message, status) => {
   const err = new Error(message);
@@ -10,48 +10,139 @@ const makeError = (message, status) => {
 };
 
 const validateObjectId = (id) => {
-  if (!mongoose.isValidObjectId(id)) throw makeError('ID inválido', 400);
+  if (!mongoose.isValidObjectId(id)) throw makeError('Invalid ID', 400);
 };
 
-const createPaciente = async ({ nombre, apellidos, fechaNacimiento, genero, contacto, diagnostico }) => {
-  return Paciente.create({ nombre, apellidos, fechaNacimiento, genero, contacto, diagnostico });
+const createPatient = async ({ firstName, lastName, birthDate, gender, contact, diagnosis }) => {
+  return Patient.create({ firstName, lastName, birthDate, gender, contact, diagnosis });
 };
 
-const getAllPacientes = async ({ page = 1, limit = 10 }) => {
-  const safePage = Math.max(1, page);
+const getAllPatients = async ({ page = 1, limit = 10 }) => {
+  const safePage  = Math.max(1, page);
   const safeLimit = Math.min(100, Math.max(1, limit));
-  const skip = (safePage - 1) * safeLimit;
+  const skip      = (safePage - 1) * safeLimit;
 
   const [data, total] = await Promise.all([
-    Paciente.find({ activo: true }).sort({ apellidos: 1, nombre: 1 }).skip(skip).limit(safeLimit),
-    Paciente.countDocuments({ activo: true }),
+    Patient.find({ active: true }).sort({ lastName: 1, firstName: 1 }).skip(skip).limit(safeLimit),
+    Patient.countDocuments({ active: true }),
   ]);
 
   return { data, total, page: safePage, limit: safeLimit };
 };
 
-const getPacienteById = async (id) => {
+const getPatientById = async (id) => {
   validateObjectId(id);
-  const paciente = await Paciente.findOne({ _id: id, activo: true });
-  if (!paciente) throw makeError('Paciente no encontrado', 404);
-  return paciente;
+  const patient = await Patient.findOne({ _id: id, active: true });
+  if (!patient) throw makeError('Patient not found', 404);
+  return patient;
 };
 
-const updatePaciente = async (id, body) => {
+const updatePatient = async (id, { firstName, lastName, birthDate, gender, contact, diagnosis, recoveryStatus } = {}) => {
   validateObjectId(id);
-  const { nombre, apellidos, fechaNacimiento, genero, contacto, diagnostico, estadoRecuperacion } = body;
   const updates = Object.fromEntries(
-    Object.entries({ nombre, apellidos, fechaNacimiento, genero, contacto, diagnostico, estadoRecuperacion })
+    Object.entries({ firstName, lastName, birthDate, gender, contact, diagnosis, recoveryStatus })
       .filter(([, v]) => v !== undefined)
   );
 
-  const paciente = await Paciente.findOneAndUpdate(
-    { _id: id, activo: true },
+  const patient = await Patient.findOneAndUpdate(
+    { _id: id, active: true },
     updates,
     { new: true, runValidators: true }
   );
-  if (!paciente) throw makeError('Paciente no encontrado', 404);
-  return paciente;
+  if (!patient) throw makeError('Patient not found', 404);
+  return patient;
 };
 
-module.exports = { createPaciente, getAllPacientes, getPacienteById, updatePaciente };
+const deletePatient = async (id) => {
+  validateObjectId(id);
+  const patient = await Patient.findOneAndUpdate(
+    { _id: id, active: true },
+    { active: false },
+    { new: true }
+  );
+  if (!patient) throw makeError('Patient not found', 404);
+  return patient;
+};
+
+const searchPatients = async ({ q, diagnosis, gender, page = 1, limit = 10 } = {}) => {
+  const safePage  = Math.max(1, page);
+  const safeLimit = Math.min(100, Math.max(1, limit));
+  const skip      = (safePage - 1) * safeLimit;
+
+  const filter = { active: true };
+
+  if (q) {
+    const regex = new RegExp(q, 'i');
+    filter.$or = [{ firstName: regex }, { lastName: regex }];
+  }
+  if (diagnosis) filter['diagnosis.type'] = new RegExp(diagnosis, 'i');
+  if (gender)    filter.gender = gender;
+
+  const [data, total] = await Promise.all([
+    Patient.find(filter).sort({ lastName: 1, firstName: 1 }).skip(skip).limit(safeLimit),
+    Patient.countDocuments(filter),
+  ]);
+
+  return { data, total, page: safePage, limit: safeLimit };
+};
+
+const getProgress = async (id, { weeks = 8 } = {}) => {
+  validateObjectId(id);
+
+  const patient = await Patient.findOne({ _id: id, active: true }).lean();
+  if (!patient) throw makeError('Patient not found', 404);
+
+  const startDate = new Date();
+  startDate.setDate(startDate.getDate() - weeks * 7);
+
+  const Session = require('../models/sesion.model');
+
+  const sessions = await Session.aggregate([
+    {
+      $match: {
+        patientId: patient._id,
+        date:      { $gte: startDate },
+      },
+    },
+    {
+      $group: {
+        _id: {
+          $dateToString: { format: '%Y-%W', date: '$date' },
+        },
+        totalSessions: { $sum: 1 },
+        averageLevel:  { $avg: '$recoveryLevel' },
+      },
+    },
+    { $sort: { _id: 1 } },
+    {
+      $project: {
+        _id:           0,
+        week:          '$_id',
+        totalSessions: 1,
+        averageLevel:  { $round: ['$averageLevel', 1] },
+      },
+    },
+  ]);
+
+  return {
+    patient: {
+      id:             patient._id,
+      fullName:       `${patient.firstName} ${patient.lastName}`,
+      recoveryStatus: patient.recoveryStatus,
+      recoveryLevel:  patient.recoveryLevel,
+    },
+    weeks,
+    startDate,
+    sessions,
+  };
+};
+
+module.exports = {
+  createPatient,
+  getAllPatients,
+  getPatientById,
+  updatePatient,
+  deletePatient,
+  searchPatients,
+  getProgress,
+};
