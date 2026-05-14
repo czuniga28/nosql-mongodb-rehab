@@ -12,23 +12,22 @@ const {
 
 const router = Router();
 
-// POST   /api/sesiones           — crear sesión
+// POST /api/sesiones - crea sesion
 router.post('/', createSesion);
 
-// GET    /api/sesiones           — listar todas (?page=1&limit=10&pacienteId=)
+// GET /api/sesiones — lista todos los pacientes con paginación
 router.get('/', getAllSesiones);
 
-// GET    /api/sesiones/search    — filtrar (?pacienteId=&tipoSesion=&fechaInicio=&fechaFin=&estado=)
-// Debe ir ANTES de /:id
+// GET /api/sesiones/search — filtrar sesiones por paciente, tipo, estado o rango de fechas
 router.get('/search', searchSesiones);
 
-// GET    /api/sesiones/:id       — obtener por ID
+// GET /api/sesiones/:id — obtener sesión por ID
 router.get('/:id', getSesionById);
 
-// PATCH  /api/sesiones/:id       — actualización parcial
+// PATCH /api/sesiones/:id — actualizar sesión por ID
 router.patch('/:id', updateSesion);
 
-// DELETE /api/sesiones/:id       — eliminar sesión
+// DELETE /api/sesiones/:id — eliminar sesión por ID
 router.delete('/:id', deleteSesion);
 
 module.exports = router;
