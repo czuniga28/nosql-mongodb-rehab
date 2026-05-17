@@ -44,9 +44,14 @@ npm install
 
 # 5. Iniciar la API en modo desarrollo
 npm run dev
+
+# 6. (Opcional) Cargar datos de prueba
+docker exec biorehab_api node scripts/seed.js
 ```
 
 La API estará disponible en `http://localhost:3000`.
+
+> **Nota:** El seed borra todos los datos existentes e inserta 10 pacientes y ~30 sesiones de ejemplo. Solo ejecutarlo una vez o cuando se quiera reiniciar la base de datos.
 
 > Para correr todo con Docker (MongoDB + API): `docker-compose up -d`
 
@@ -119,9 +124,9 @@ nosql-mongodb-rehab/
 
 | Nombre | Carné |
 |--------|-------|
-| | |
-| | |
-| | |
-| | |
+| Katherine Acosta Barquero | B70047 |
+| Elizabeth Huang Wu | C23913 |
+| Henoc Rojas Carrillo | C26764 |
+| Christopher Zúñiga Rojas | C28730 |
 
-**Profesor:** · **Ciclo:** I 2026
+**Profesor:** M.Sc. Sleyter Angulo Chavarria · **Ciclo:** I 2026

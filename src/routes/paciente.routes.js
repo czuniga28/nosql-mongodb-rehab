@@ -2,37 +2,37 @@
 
 const { Router } = require('express');
 const {
-  createPaciente,
-  getAllPacientes,
-  getPacienteById,
-  updatePaciente,
-  deletePaciente,
-  searchPacientes,
-  getProgreso,
+  createPatient,
+  getAllPatients,
+  getPatientById,
+  updatePatient,
+  deletePatient,
+  searchPatients,
+  getProgress,
 } = require('../controllers/paciente.controller');
 
 const router = Router();
 
-// POST   /api/pacientes          — crear paciente
-router.post('/', createPaciente);
+// POST   /api/patients          — create patient
+router.post('/', createPatient);
 
-// GET    /api/pacientes          — listar todos (?page=1&limit=10)
-router.get('/', getAllPacientes);
+// GET    /api/patients          — list all (?page=1&limit=10)
+router.get('/', getAllPatients);
 
-// GET    /api/pacientes/search   — buscar/filtrar (?q=&diagnostico=&genero=)
-// Debe ir ANTES de /:id para que Express no lo interprete como un ID
-router.get('/search', searchPacientes);
+// GET    /api/patients/search   — search/filter (?q=&diagnostico=&genero=)
+// Must come BEFORE /:id so Express doesn't treat 'search' as an ID
+router.get('/search', searchPatients);
 
-// GET    /api/pacientes/:id/progreso — aggregation pipeline de recuperación (?semanas=8)
-router.get('/:id/progreso', getProgreso);
+// GET    /api/patients/:id/progress — weekly recovery aggregation (?weeks=8)
+router.get('/:id/progress', getProgress);
 
-// GET    /api/pacientes/:id      — obtener por ID
-router.get('/:id', getPacienteById);
+// GET    /api/patients/:id      — get by ID
+router.get('/:id', getPatientById);
 
-// PUT    /api/pacientes/:id      — actualizar paciente completo
-router.put('/:id', updatePaciente);
+// PUT    /api/patients/:id      — update patient
+router.put('/:id', updatePatient);
 
-// DELETE /api/pacientes/:id      — eliminar paciente
-router.delete('/:id', deletePaciente);
+// DELETE /api/patients/:id      — soft delete patient
+router.delete('/:id', deletePatient);
 
 module.exports = router;

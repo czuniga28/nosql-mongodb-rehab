@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>BioRehab — API Tester</title>
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <header>
+    <h1>BioRehab</h1>
+    <nav>
+      <button class="tab-btn active" data-tab="patients">Patients</button>
+      <button class="tab-btn" data-tab="sessions">Sessions</button>
+    </nav>
+  </header>
+
+  <main>
+    <!-- ─────────────── PATIENTS ─────────────── -->
+    <section id="tab-patients" class="tab active">
+      <div class="grid">
+        <div class="card">
+          <h2>Create / Update Patient</h2>
+          <form id="patient-form">
+            <input type="hidden" name="id" />
+            <div class="row">
+              <label>First name<input name="firstName" required /></label>
+              <label>Last name<input name="lastName" required /></label>
+            </div>
+            <div class="row">
+              <label>Birth date<input type="date" name="birthDate" required /></label>
+              <label>Gender
+                <select name="gender" required>
+                  <option value="male">male</option>
+                  <option value="female">female</option>
+                  <option value="other">other</option>
+                </select>
+              </label>
+            </div>
+            <div class="row">
+              <label>Phone<input name="phone" /></label>
+              <label>Email<input type="email" name="email" /></label>
+            </div>
+            <div class="row">
+              <label>Diagnosis type<input name="diagnosisType" required /></label>
+              <label>Diagnosis date<input type="date" name="diagnosisDate" /></label>
+            </div>
+            <label>Diagnosis description<textarea name="diagnosisDescription" rows="2"></textarea></label>
+            <div class="row">
+              <label>Recovery status
+                <select name="recoveryStatus">
+                  <option value="">(unset)</option>
+                  <option value="initial">initial</option>
+                  <option value="in_progress">in_progress</option>
+                  <option value="advanced">advanced</option>
+                  <option value="discharged">discharged</option>
+                </select>
+              </label>
+              <label>Recovery level (0–100)<input type="number" name="recoveryLevel" min="0" max="100" /></label>
+            </div>
+            <div class="actions">
+              <button type="submit">Save</button>
+              <button type="button" id="patient-reset">Reset</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="card">
+          <h2>Search</h2>
+          <form id="patient-search">
+            <div class="row">
+              <label>Text (q)
+                <div class="patient-autocomplete">
+                  <input name="q" id="patient-search-q" placeholder="name…" autocomplete="off" />
+                  <div id="patient-search-dropdown" class="patient-dropdown" hidden></div>
+                </div>
+              </label>
+              <label>Diagnosis<input name="diagnosis" /></label>
+              <label>Gender
+                <select name="gender">
+                  <option value="">(any)</option>
+                  <option value="male">male</option>
+                  <option value="female">female</option>
+                  <option value="other">other</option>
+                </select>
+              </label>
+            </div>
+            <div class="actions">
+              <button type="submit">Search</button>
+              <button type="button" id="patient-reload">Reload all</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Patients</h2>
+        <div id="patient-list" class="list"></div>
+      </div>
+
+      <div class="card" id="progress-card" hidden>
+        <h2>Progress — <span id="progress-name"></span></h2>
+        <div class="row">
+          <label>Weeks<input type="number" id="progress-weeks" value="8" min="1" max="52" /></label>
+          <button id="progress-refresh">Refresh</button>
+          <button id="progress-close">Close</button>
+        </div>
+        <pre id="progress-output"></pre>
+      </div>
+    </section>
+
+    <!-- ─────────────── SESSIONS ─────────────── -->
+    <section id="tab-sessions" class="tab">
+      <div class="grid">
+        <div class="card">
+          <h2>Create / Update Session</h2>
+          <form id="session-form">
+            <input type="hidden" name="id" />
+            <div class="row">
+              <label>Patient name
+                <div class="patient-autocomplete">
+                  <input id="session-patient-name" placeholder="Start typing a name…" required autocomplete="off" />
+                  <div id="session-patient-dropdown" class="patient-dropdown" hidden></div>
+                </div>
+                <span id="session-patient-hint" class="patient-hint"></span>
+              </label>
+              <label>Date<input type="datetime-local" name="date" /></label>
+            </div>
+            <div class="row">
+              <label>Type
+                <select name="sessionType" required>
+                  <option value="evaluation">evaluation</option>
+                  <option value="therapy">therapy</option>
+                  <option value="strengthening">strengthening</option>
+                  <option value="stretching">stretching</option>
+                  <option value="cardio">cardio</option>
+                  <option value="other">other</option>
+                </select>
+              </label>
+              <label>Status
+                <select name="status">
+                  <option value="scheduled">scheduled</option>
+                  <option value="in_progress">in_progress</option>
+                  <option value="completed">completed</option>
+                  <option value="cancelled">cancelled</option>
+                </select>
+              </label>
+            </div>
+            <div class="row">
+              <label>Therapist<input name="therapist" /></label>
+              <label>Duration (min)<input type="number" name="durationMinutes" min="1" /></label>
+            </div>
+            <div class="row">
+              <label>Pain (0–10)<input type="number" name="painLevel" min="0" max="10" /></label>
+              <label>Overall score (0–100)<input type="number" name="overallScore" min="0" max="100" /></label>
+            </div>
+            <label>Clinical notes<textarea name="clinicalNotes" rows="2"></textarea></label>
+            <div class="exercise-section">
+              <span class="exercise-label">Exercises</span>
+              <div class="exercise-inputs row">
+                <label>Name<input id="ex-name" placeholder="Squat…" /></label>
+                <label>Sets<input id="ex-sets" type="number" min="1" placeholder="3" /></label>
+                <label>Reps<input id="ex-reps" type="number" min="0" placeholder="12" /></label>
+                <label>Score (0–100)<input id="ex-score" type="number" min="0" max="100" placeholder="80" /></label>
+                <button type="button" id="add-exercise">+ Add</button>
+              </div>
+              <div id="exercise-list"></div>
+            </div>
+            <div class="actions">
+              <button type="submit">Save</button>
+              <button type="button" id="session-reset">Reset</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="card">
+          <h2>Search</h2>
+          <form id="session-search">
+            <div class="row">
+              <label>Patient name
+                <div class="patient-autocomplete">
+                  <input id="search-patient-name" placeholder="eg. Carlos…" autocomplete="off" />
+                  <div id="search-patient-dropdown" class="patient-dropdown" hidden></div>
+                </div>
+                <span id="search-patient-hint" class="patient-hint"></span>
+              </label>
+              <label>Type
+                <select name="sessionType">
+                  <option value="">(any)</option>
+                  <option value="evaluation">evaluation</option>
+                  <option value="therapy">therapy</option>
+                  <option value="strengthening">strengthening</option>
+                  <option value="stretching">stretching</option>
+                  <option value="cardio">cardio</option>
+                  <option value="other">other</option>
+                </select>
+              </label>
+              <label>Status
+                <select name="status">
+                  <option value="">(any)</option>
+                  <option value="scheduled">scheduled</option>
+                  <option value="in_progress">in_progress</option>
+                  <option value="completed">completed</option>
+                  <option value="cancelled">cancelled</option>
+                </select>
+              </label>
+            </div>
+            <div class="row">
+              <label>From<input type="date" name="startDate" /></label>
+              <label>To<input type="date" name="endDate" /></label>
+            </div>
+            <div class="actions">
+              <button type="submit">Search</button>
+              <button type="button" id="session-reload">Reload all</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Sessions</h2>
+        <div id="session-list" class="list"></div>
+      </div>
+    </section>
+  </main>
+
+  <div id="toast" class="toast" hidden></div>
+  <script src="/app.js"></script>
+</body>
+</html>
