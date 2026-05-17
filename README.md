@@ -119,9 +119,9 @@ nosql-mongodb-rehab/
 
 | Nombre | Carné |
 |--------|-------|
-| | |
-| | |
-| | |
-| | |
+| Katherine Acosta Barquero | B70047 |
+| Elizabeth Huang Wu | C23913 |
+| Henoc Rojas Carrillo | C26764 |
+| Christopher Zúñiga Rojas | C28730 |
 
-**Profesor:** · **Ciclo:** I 2026
+**Profesor:** M.Sc. Sleyter Angulo Chavarria · **Ciclo:** I 2026

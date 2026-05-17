@@ -5,7 +5,7 @@ const mongoose = require('mongoose');
 // ── Sub-schema: biomechanical data per exercise ───────────────────────────────
 const exerciseSchema = new mongoose.Schema(
   {
-    firstName: {
+    name: {
       type: String,
       required: [true, 'Exercise name is required'],
       trim: true,
