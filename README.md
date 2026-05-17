@@ -36,17 +36,11 @@ cd nosql-mongodb-rehab
 # 2. Crear archivo de variables de entorno
 cp .env.example .env
 
-# 3. Levantar MongoDB con Docker
-docker-compose up -d mongo
+# 3. Levantar contenedores en Docker
+docker-compose up --build
 
-# 4. Instalar dependencias
-npm install
-
-# 5. Iniciar la API en modo desarrollo
-npm run dev
-
-# 6. (Opcional) Cargar datos de prueba
-docker exec biorehab_api node scripts/seed.js
+# 4. (Opcional) Cargar datos de prueba
+docker exec biorehab_api npm run seed
 ```
 
 La API estará disponible en `http://localhost:3000`.
