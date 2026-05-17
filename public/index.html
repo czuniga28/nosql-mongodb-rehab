@@ -69,7 +69,12 @@
           <h2>Search</h2>
           <form id="patient-search">
             <div class="row">
-              <label>Text (q)<input name="q" placeholder="name…" /></label>
+              <label>Text (q)
+                <div class="patient-autocomplete">
+                  <input name="q" id="patient-search-q" placeholder="name…" autocomplete="off" />
+                  <div id="patient-search-dropdown" class="patient-dropdown" hidden></div>
+                </div>
+              </label>
               <label>Diagnosis<input name="diagnosis" /></label>
               <label>Gender
                 <select name="gender">
@@ -112,7 +117,13 @@
           <form id="session-form">
             <input type="hidden" name="id" />
             <div class="row">
-              <label>Patient ID<input name="patientId" required /></label>
+              <label>Patient name
+                <div class="patient-autocomplete">
+                  <input id="session-patient-name" placeholder="Start typing a name…" required autocomplete="off" />
+                  <div id="session-patient-dropdown" class="patient-dropdown" hidden></div>
+                </div>
+                <span id="session-patient-hint" class="patient-hint"></span>
+              </label>
               <label>Date<input type="datetime-local" name="date" /></label>
             </div>
             <div class="row">
@@ -144,9 +155,17 @@
               <label>Overall score (0–100)<input type="number" name="overallScore" min="0" max="100" /></label>
             </div>
             <label>Clinical notes<textarea name="clinicalNotes" rows="2"></textarea></label>
-            <label>Exercises (JSON array, optional)
-              <textarea name="exercises" rows="4" placeholder='[{"name":"Squat","sets":3,"reps":12,"score":85}]'></textarea>
-            </label>
+            <div class="exercise-section">
+              <span class="exercise-label">Exercises</span>
+              <div class="exercise-inputs row">
+                <label>Name<input id="ex-name" placeholder="Squat…" /></label>
+                <label>Sets<input id="ex-sets" type="number" min="1" placeholder="3" /></label>
+                <label>Reps<input id="ex-reps" type="number" min="0" placeholder="12" /></label>
+                <label>Score (0–100)<input id="ex-score" type="number" min="0" max="100" placeholder="80" /></label>
+                <button type="button" id="add-exercise">+ Add</button>
+              </div>
+              <div id="exercise-list"></div>
+            </div>
             <div class="actions">
               <button type="submit">Save</button>
               <button type="button" id="session-reset">Reset</button>
@@ -158,7 +177,13 @@
           <h2>Search</h2>
           <form id="session-search">
             <div class="row">
-              <label>Patient ID<input name="patientId" /></label>
+              <label>Patient name
+                <div class="patient-autocomplete">
+                  <input id="search-patient-name" placeholder="eg. Carlos…" autocomplete="off" />
+                  <div id="search-patient-dropdown" class="patient-dropdown" hidden></div>
+                </div>
+                <span id="search-patient-hint" class="patient-hint"></span>
+              </label>
               <label>Type
                 <select name="sessionType">
                   <option value="">(any)</option>

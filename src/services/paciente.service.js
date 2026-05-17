@@ -72,8 +72,16 @@ const searchPatients = async ({ q, diagnosis, gender, page = 1, limit = 10 } = {
   const filter = { active: true };
 
   if (q) {
-    const regex = new RegExp(q, 'i');
-    filter.$or = [{ firstName: regex }, { lastName: regex }];
+    const parts = q.trim().split(/\s+/);
+    if (parts.length >= 2) {
+      filter.$and = [
+        { firstName: new RegExp(parts[0], 'i') },
+        { lastName: new RegExp(parts.slice(1).join(' '), 'i') },
+      ];
+    } else {
+      const regex = new RegExp(q, 'i');
+      filter.$or = [{ firstName: regex }, { lastName: regex }];
+    }
   }
   if (diagnosis) filter['diagnosis.type'] = new RegExp(diagnosis, 'i');
   if (gender)    filter.gender = gender;
