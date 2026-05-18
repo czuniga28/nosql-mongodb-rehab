@@ -10,7 +10,7 @@ Sistema de API REST para gestionar pacientes y sesiones de rehabilitación físi
 ## Tecnologías
 
 | Capa | Tecnología |
-|------|-----------|
+| ------ | ----------- |
 | Runtime | Node.js 20 |
 | Framework | Express 4 |
 | ODM | Mongoose 8 |
@@ -63,7 +63,7 @@ La API estará disponible en `http://localhost:3000`.
 ### Pacientes `/api/pacientes`
 
 | Método | Ruta | Descripción |
-|--------|------|-------------|
+| -------- | ------ | ------------- |
 | `POST` | `/api/pacientes` | Crear paciente |
 | `GET` | `/api/pacientes` | Listar todos (`?page&limit`) |
 | `GET` | `/api/pacientes/:id` | Obtener por ID |
@@ -75,7 +75,7 @@ La API estará disponible en `http://localhost:3000`.
 ### Sesiones `/api/sesiones`
 
 | Método | Ruta | Descripción |
-|--------|------|-------------|
+| -------- | ------ | ------------- |
 | `POST` | `/api/sesiones` | Crear sesión |
 | `GET` | `/api/sesiones` | Listar todas (`?page&limit&pacienteId`) |
 | `GET` | `/api/sesiones/:id` | Obtener por ID |
@@ -87,7 +87,7 @@ La API estará disponible en `http://localhost:3000`.
 
 ## Estructura del proyecto
 
-```
+``` txt
 nosql-mongodb-rehab/
 ├── docker-compose.yml
 ├── Dockerfile
@@ -114,10 +114,36 @@ nosql-mongodb-rehab/
 
 ---
 
+## Pruebas API con Hurl
+
+Se incluyen pruebas de integración para la API usando Hurl. Los ficheros de prueba están en [tests/api/](tests/api/) y siguen el patrón `*.hurl`:
+
+- `00.health.hurl` — comprobación de salud del servidor.
+- `01.CrearRegistro.hurl` — crea varios pacientes de ejemplo.
+- `02.ObtenerRegistros.hurl` — lista pacientes paginados.
+- `03.ObtenerRegistro.hurl` — obtiene un registro por ID (usa captures).
+- `04.ActualizarRegistro.hurl` — actualiza un paciente usando un ID capturado.
+- `05.BorrarRegistro.hurl` — elimina un paciente usando un ID capturado.
+- `06.Busqueda.hurl` — ejemplo de búsqueda por parámetros.
+
+Recomendaciones rápidas:
+
+- Se debe asegurar de tener la API corriendo en `http://localhost:3000` (por ejemplo `npm run dev` o `docker-compose up -d`).
+- Instala Hurl desde <https://hurl.dev>.
+
+Ejemplo de ejecución:
+
+```powershell
+# Ejecutar un test (PowerShell o bash)
+hurl tests/api/06.Busqueda.hurl
+```
+
+---
+
 ## Integrantes del grupo
 
 | Nombre | Carné |
-|--------|-------|
+| -------- | ------- |
 | Katherine Acosta Barquero | B70047 |
 | Elizabeth Huang Wu | C23913 |
 | Henoc Rojas Carrillo | C26764 |
