@@ -115,6 +115,32 @@ nosql-mongodb-rehab/
 
 ---
 
+## Pruebas API con Hurl
+
+Se incluyen pruebas de integración para la API usando Hurl. Los ficheros de prueba están en [tests/api/](tests/api/) y siguen el patrón `*.hurl`:
+
+- `00.health.hurl` — comprobación de salud del servidor.
+- `01.CrearRegistro.hurl` — crea varios pacientes de ejemplo.
+- `02.ObtenerRegistros.hurl` — lista pacientes paginados.
+- `03.ObtenerRegistro.hurl` — obtiene un registro por ID (usa captures).
+- `04.ActualizarRegistro.hurl` — actualiza un paciente usando un ID capturado.
+- `05.BorrarRegistro.hurl` — elimina un paciente usando un ID capturado.
+- `06.Busqueda.hurl` — ejemplo de búsqueda por parámetros.
+
+Recomendaciones rápidas:
+
+- Se debe asegurar de tener la API corriendo en `http://localhost:3000` (por ejemplo `npm run dev` o `docker-compose up -d`).
+- Instala Hurl desde <https://hurl.dev>.
+
+Ejemplo de ejecución:
+
+```powershell
+# Ejecutar un test (PowerShell o bash)
+hurl tests/api/06.Busqueda.hurl
+```
+
+---
+
 ## Integrantes del grupo
 
 | Nombre | Carné |
