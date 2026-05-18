@@ -10,7 +10,7 @@ Sistema de API REST para gestionar pacientes y sesiones de rehabilitación físi
 ## Tecnologías
 
 | Capa | Tecnología |
-|------|-----------|
+| ------ | ----------- |
 | Runtime | Node.js 20 |
 | Framework | Express 4 |
 | ODM | Mongoose 8 |
@@ -64,7 +64,7 @@ La API estará disponible en `http://localhost:3000`.
 ### Pacientes `/api/pacientes`
 
 | Método | Ruta | Descripción |
-|--------|------|-------------|
+| -------- | ------ | ------------- |
 | `POST` | `/api/pacientes` | Crear paciente |
 | `GET` | `/api/pacientes` | Listar todos (`?page&limit`) |
 | `GET` | `/api/pacientes/:id` | Obtener por ID |
@@ -76,7 +76,7 @@ La API estará disponible en `http://localhost:3000`.
 ### Sesiones `/api/sesiones`
 
 | Método | Ruta | Descripción |
-|--------|------|-------------|
+| -------- | ------ | ------------- |
 | `POST` | `/api/sesiones` | Crear sesión |
 | `GET` | `/api/sesiones` | Listar todas (`?page&limit&pacienteId`) |
 | `GET` | `/api/sesiones/:id` | Obtener por ID |
@@ -88,7 +88,7 @@ La API estará disponible en `http://localhost:3000`.
 
 ## Estructura del proyecto
 
-```
+``` txt
 nosql-mongodb-rehab/
 ├── docker-compose.yml
 ├── Dockerfile
@@ -144,7 +144,7 @@ hurl tests/api/06.Busqueda.hurl
 ## Integrantes del grupo
 
 | Nombre | Carné |
-|--------|-------|
+| -------- | ------- |
 | Katherine Acosta Barquero | B70047 |
 | Elizabeth Huang Wu | C23913 |
 | Henoc Rojas Carrillo | C26764 |
